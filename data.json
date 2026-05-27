@@ -1,1 +1,15 @@
-[]
+[
+  {
+    "date": "2026-05-27",
+    "source": "telegram",
+    "sleepHours": 6,
+    "sleepQuality": 7,
+    "mood": 7,
+    "stress": 3,
+    "calories": 2000,
+    "water": 7,
+    "exercise": 60,
+    "moodNotes": "felt good",
+    "savedAt": "2026-05-27T10:03:44.543Z"
+  }
+]
