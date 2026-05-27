@@ -1,13 +1,48 @@
 const STORAGE_ENTRIES = "health-tracker:entries";
 const STORAGE_GOALS = "health-tracker:goals";
+const STORAGE_REMOTE = "health-tracker:remote";
+
+const REMOTE_URL = "https://raw.githubusercontent.com/pznnmarketing-beep/health-tracker/main/data.json";
 
 const RING_CIRC = 2 * Math.PI * 52; // 326.726…
 
-const loadEntries = () => {
+const loadLocalEntries = () => {
   try { return JSON.parse(localStorage.getItem(STORAGE_ENTRIES)) || []; }
   catch { return []; }
 };
-const saveEntries = (e) => localStorage.setItem(STORAGE_ENTRIES, JSON.stringify(e));
+const loadRemoteEntries = () => {
+  try { return JSON.parse(localStorage.getItem(STORAGE_REMOTE)) || []; }
+  catch { return []; }
+};
+// Telegram entries (remote) win on the same date.
+const loadEntries = () => {
+  const local = loadLocalEntries();
+  const remote = loadRemoteEntries();
+  const byDate = new Map();
+  for (const e of local) byDate.set(e.date, e);
+  for (const e of remote) byDate.set(e.date, e);
+  return Array.from(byDate.values()).sort((a, b) => b.date.localeCompare(a.date));
+};
+const saveEntries = (entries) => {
+  // Only persist locally-sourced entries to localStorage.
+  const local = entries.filter((e) => e.source !== "telegram");
+  localStorage.setItem(STORAGE_ENTRIES, JSON.stringify(local));
+};
+
+async function fetchRemoteEntries() {
+  try {
+    const res = await fetch(REMOTE_URL + "?t=" + Date.now(), { cache: "no-store" });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (Array.isArray(data)) {
+      localStorage.setItem(STORAGE_REMOTE, JSON.stringify(data));
+      renderDashboard();
+      renderHistory();
+    }
+  } catch (e) {
+    console.warn("Couldn't fetch remote entries:", e.message);
+  }
+}
 
 const loadGoals = () => {
   try { return JSON.parse(localStorage.getItem(STORAGE_GOALS)) || {}; }
@@ -303,8 +338,8 @@ function renderHistory() {
   list.innerHTML = entries.map((e, idx) => `
     <div class="history-entry">
       <div class="history-head">
-        <span class="history-date">${formatDate(e.date)}</span>
-        <button class="btn small danger" data-delete="${idx}">Delete</button>
+        <span class="history-date">${formatDate(e.date)}${e.source === "telegram" ? ' <span class="src-badge">via Telegram</span>' : ""}</span>
+        ${e.source === "telegram" ? "" : `<button class="btn small danger" data-delete="${idx}">Delete</button>`}
       </div>
       <div class="history-stats">
         <div><span class="h-label">Sleep</span><span class="h-val">${fmt(e.sleepHours, "h")}</span></div>
@@ -325,8 +360,8 @@ function renderHistory() {
       const entries = loadEntries();
       const removed = entries[idx];
       if (confirm(`Delete entry for ${removed.date}?`)) {
-        entries.splice(idx, 1);
-        saveEntries(entries);
+        const local = loadLocalEntries().filter((e) => e.date !== removed.date);
+        localStorage.setItem(STORAGE_ENTRIES, JSON.stringify(local));
         renderHistory();
         renderHeroRings();
       }
@@ -364,6 +399,7 @@ function showFeedback(id, msg, isError = false) {
   setTimeout(() => { if (el.textContent === msg) el.textContent = ""; }, 3000);
 }
 
-// initial render
+// initial render + remote fetch
 renderDashboard();
 renderHistory();
+fetchRemoteEntries();

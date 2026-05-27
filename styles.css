@@ -431,6 +431,19 @@ input[type="date"] { color-scheme: dark; }
   font-size: 13px;
   letter-spacing: 0.05em;
 }
+.src-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background: rgba(122, 92, 255, 0.15);
+  color: var(--sleep);
+  border-radius: 99px;
+  vertical-align: middle;
+}
 .history-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
