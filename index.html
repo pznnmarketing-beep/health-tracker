@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Health Tracker</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>Health Tracker</h1>
+    <p class="subtitle">Daily Overview</p>
+  </header>
+
+  <!-- HERO RINGS -->
+  <section class="hero">
+    <div class="rings">
+      <!-- RECOVERY (mood) -->
+      <div class="ring-card">
+        <div class="ring-label">Recovery</div>
+        <svg class="ring-svg" viewBox="0 0 120 120">
+          <circle class="ring-track" cx="60" cy="60" r="52"></circle>
+          <circle id="ring-recovery" class="ring-progress" cx="60" cy="60" r="52"
+                  stroke="#16ec06"
+                  stroke-dasharray="326.7" stroke-dashoffset="326.7"></circle>
+        </svg>
+        <div class="ring-center">
+          <div id="recovery-value" class="ring-value recovery-color">--<span class="ring-unit">%</span></div>
+        </div>
+        <div class="ring-sub" id="recovery-sub">Mood-based</div>
+      </div>
+
+      <!-- STRAIN (exercise) -->
+      <div class="ring-card">
+        <div class="ring-label">Strain</div>
+        <svg class="ring-svg" viewBox="0 0 120 120">
+          <circle class="ring-track" cx="60" cy="60" r="52"></circle>
+          <circle id="ring-strain" class="ring-progress" cx="60" cy="60" r="52"
+                  stroke="#0093e7"
+                  stroke-dasharray="326.7" stroke-dashoffset="326.7"></circle>
+        </svg>
+        <div class="ring-center">
+          <div id="strain-value" class="ring-value strain-color">--</div>
+        </div>
+        <div class="ring-sub" id="strain-sub">0–21 scale</div>
+      </div>
+
+      <!-- SLEEP -->
+      <div class="ring-card">
+        <div class="ring-label">Sleep</div>
+        <svg class="ring-svg" viewBox="0 0 120 120">
+          <circle class="ring-track" cx="60" cy="60" r="52"></circle>
+          <circle id="ring-sleep" class="ring-progress" cx="60" cy="60" r="52"
+                  stroke="#7a5cff"
+                  stroke-dasharray="326.7" stroke-dashoffset="326.7"></circle>
+        </svg>
+        <div class="ring-center">
+          <div id="sleep-value" class="ring-value sleep-color">--<span class="ring-unit">%</span></div>
+        </div>
+        <div class="ring-sub" id="sleep-sub">Of need</div>
+      </div>
+    </div>
+  </section>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-tab="dashboard" role="tab">Overview</button>
+    <button class="tab" data-tab="log" role="tab">Log</button>
+    <button class="tab" data-tab="history" role="tab">History</button>
+    <button class="tab" data-tab="goals" role="tab">Goals</button>
+  </nav>
+
+  <main>
+    <!-- DASHBOARD TAB -->
+    <section id="tab-dashboard" class="tab-panel active">
+      <div class="card">
+        <h2>Today vs. Goals</h2>
+        <div id="dashboard-goals" class="goal-grid">
+          <p class="empty">Set goals to see progress here.</p>
+        </div>
+      </div>
+      <div class="card">
+        <h2>7-Day Average</h2>
+        <div id="dashboard-averages" class="stat-grid">
+          <p class="empty">Log entries to see averages.</p>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Sleep — Last 7 Days</h2>
+        <div id="sleep-chart" class="bar-chart"></div>
+      </div>
+    </section>
+
+    <!-- LOG TAB -->
+    <section id="tab-log" class="tab-panel">
+      <form id="entry-form" class="card">
+        <h2>New Entry</h2>
+
+        <div class="field">
+          <label for="entry-date">Date</label>
+          <input type="date" id="entry-date" required />
+        </div>
+
+        <fieldset>
+          <legend>Sleep</legend>
+          <div class="row">
+            <div class="field">
+              <label for="sleep-hours">Hours</label>
+              <input type="number" id="sleep-hours" min="0" max="24" step="0.1" placeholder="e.g. 7.5" />
+            </div>
+            <div class="field">
+              <label for="sleep-quality">Quality (1–10)</label>
+              <input type="number" id="sleep-quality" min="1" max="10" step="1" placeholder="1–10" />
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Mental Health</legend>
+          <div class="row">
+            <div class="field">
+              <label for="mood">Mood (1–10)</label>
+              <input type="number" id="mood" min="1" max="10" step="1" placeholder="1–10" />
+            </div>
+            <div class="field">
+              <label for="stress">Stress (1–10)</label>
+              <input type="number" id="stress" min="1" max="10" step="1" placeholder="1–10" />
+            </div>
+          </div>
+          <div class="field">
+            <label for="mood-notes">Notes</label>
+            <textarea id="mood-notes" rows="3" placeholder="How are you feeling today?"></textarea>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Nutrition &amp; Activity</legend>
+          <div class="row">
+            <div class="field">
+              <label for="calories">Calories</label>
+              <input type="number" id="calories" min="0" step="1" placeholder="e.g. 2100" />
+            </div>
+            <div class="field">
+              <label for="water">Water (glasses)</label>
+              <input type="number" id="water" min="0" step="1" placeholder="e.g. 8" />
+            </div>
+          </div>
+          <div class="field">
+            <label for="exercise">Exercise (minutes)</label>
+            <input type="number" id="exercise" min="0" step="1" placeholder="e.g. 30" />
+          </div>
+        </fieldset>
+
+        <div class="actions">
+          <button type="submit" class="btn primary">Save Entry</button>
+          <button type="reset" class="btn">Clear</button>
+        </div>
+        <p id="save-feedback" class="feedback" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <!-- HISTORY TAB -->
+    <section id="tab-history" class="tab-panel">
+      <div class="card">
+        <div class="card-head">
+          <h2>History</h2>
+          <button id="export-btn" class="btn small">Export JSON</button>
+        </div>
+        <div id="history-list">
+          <p class="empty">No entries yet. Log your first one.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- GOALS TAB -->
+    <section id="tab-goals" class="tab-panel">
+      <form id="goals-form" class="card">
+        <h2>Your Goals</h2>
+        <p class="hint">Leave any field blank to skip tracking it.</p>
+
+        <fieldset>
+          <legend>Sleep</legend>
+          <div class="row">
+            <div class="field">
+              <label for="goal-sleep">Hours target</label>
+              <input type="number" id="goal-sleep" min="0" max="24" step="0.1" placeholder="e.g. 8" />
+            </div>
+            <div class="field">
+              <label for="goal-sleep-quality">Quality min (1–10)</label>
+              <input type="number" id="goal-sleep-quality" min="1" max="10" step="1" placeholder="e.g. 7" />
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Mental Health</legend>
+          <div class="row">
+            <div class="field">
+              <label for="goal-mood">Mood min (1–10)</label>
+              <input type="number" id="goal-mood" min="1" max="10" step="1" placeholder="e.g. 7" />
+            </div>
+            <div class="field">
+              <label for="goal-stress">Stress max (1–10)</label>
+              <input type="number" id="goal-stress" min="1" max="10" step="1" placeholder="e.g. 4" />
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Nutrition &amp; Activity</legend>
+          <div class="row">
+            <div class="field">
+              <label for="goal-calories">Calories target</label>
+              <input type="number" id="goal-calories" min="0" step="1" placeholder="e.g. 2000" />
+            </div>
+            <div class="field">
+              <label for="goal-water">Water glasses min</label>
+              <input type="number" id="goal-water" min="0" step="1" placeholder="e.g. 8" />
+            </div>
+          </div>
+          <div class="field">
+            <label for="goal-exercise">Exercise minutes</label>
+            <input type="number" id="goal-exercise" min="0" step="1" placeholder="e.g. 30" />
+          </div>
+        </fieldset>
+
+        <div class="actions">
+          <button type="submit" class="btn primary">Save Goals</button>
+        </div>
+        <p id="goals-feedback" class="feedback" aria-live="polite"></p>
+      </form>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    Data stored locally
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
