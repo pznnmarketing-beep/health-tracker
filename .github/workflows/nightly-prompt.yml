@@ -1,0 +1,41 @@
+  name: Nightly health prompt
+  
+  on:
+    schedule:
+      - cron: '0 20 * * *'
+    workflow_dispatch:
+
+  concurrency:
+    group: nightly-prompt
+    cancel-in-progress: false
+
+  jobs:
+    prompt:
+      runs-on: ubuntu-latest
+      timeout-minutes: 150
+      permissions:
+        contents: write
+      steps:
+        - uses: actions/checkout@v4
+  
+        - uses: actions/setup-node@v4
+          with:
+            node-version: 20
+
+        - name: Run nightly prompt
+          env:
+            TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+            TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          run: node .github/scripts/nightly-prompt.js
+
+        - name: Commit new entry
+          run: |
+            git config user.name "health-tracker-bot"
+            git config user.email "bot@users.noreply.github.com"
+            git add data.json
+            if git diff --staged --quiet; then
+              echo "No changes to commit."
+            else
+              git commit -m "Log entry from Telegram ($(date -u +%Y-%m-%d))"
+              git push
+            fi
