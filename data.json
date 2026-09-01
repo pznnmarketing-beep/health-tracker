@@ -1,5 +1,12 @@
 [
   {
+    "date": "2026-09-01",
+    "source": "telegram",
+    "sleepHours": null,
+    "moodNotes": "",
+    "savedAt": "2026-09-01T23:53:06.758Z"
+  },
+  {
     "date": "2026-08-31",
     "source": "telegram",
     "sleepHours": null,
